@@ -1,0 +1,66 @@
+service: go-til
+
+provider:
+  name: aws
+  runtime: go1.x
+  region: eu-central-1
+  memorySize: 512
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:eu-central-1:*:table/tils"
+
+resources:
+  Resources:
+    TilDB:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'tils'
+
+
+package:
+ exclude:
+   - ./**
+ include:
+   - ./bin/**
+
+functions:
+  insert:
+    handler: bin/insert
+    description: Insert new til
+    events:
+      - http:
+          path: tils
+          method: post
+          authorizer: aws_iam
+  remove:
+    handler: bin/remove
+    description: Remove til
+    events:
+      - http:
+          path: tils/{id}
+          method: delete
+          authorizer: aws_iam
+  list:
+    handler: bin/list
+    description: List tils by user id
+    events:
+      - http:
+          path: tils
+          method: get
+          authorizer: aws_iam

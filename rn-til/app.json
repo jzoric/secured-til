@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name":"Til",
+    "icon":"./app-icon.png",
+    "version":"1.0.0",
+    "slug":"til-slug",
+    "sdkVersion": "27.0.0",
+    "android":{
+      "package":"com.jovicazoric.til"
+    }
+  }
+}
